@@ -8,12 +8,13 @@ Airport.Preloader.prototype = {
         this.load.bitmapFont('kenneyfont', 'fonts/kenneyspace_72/kenneyspace_72.png', 'fonts/kenneyspace_72/kenneyspace_72.xml');
         this.load.image('white', 'images/white.png');
         this.load.image('red', 'images/plane.png');
+        this.load.image('background', 'images/hills-scroll.png');
     },
 
     create: function() {
         this.game.stage.backgroundColor = '#ffffff';
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-        
+
         var logo = this.add.sprite(this.world.width/2, this.world.height/2, 'appsbude');
         logo.anchor.set(0.5, 0.5);
 

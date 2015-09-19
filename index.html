@@ -22,7 +22,7 @@
 <body>
 
 <script type="text/javascript">
-(function() {
+window.onload = function() {
 
 	//	100% of the browser window - see Boot.js for additional configuration
 	var SAFE_ZONE_WIDTH = 960;// * window.devicePixelRatio;
@@ -37,7 +37,7 @@
 
 	//	Now start the Boot state.
 	game.state.start('Boot');
-})();
+};
 
 </script>
 
