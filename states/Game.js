@@ -14,9 +14,9 @@ Airport.Game.prototype = {
 	},
 
 	setupPlane: function() {
-		this.plane = this.game.add.sprite(100, 100, 'red');
-		this.plane.scale.x *= 2;
-		this.plane.anchor.setTo(0.5, 0.5);
+		this.plane = this.game.add.sprite(100, 100, 'plane');
+		this.plane.scale.x = -1;
+		this.plane.anchor.setTo(0.3, 0.5);
 		this.game.physics.enable(this.plane, Phaser.Physics.ARCADE);
 
 		this.planeFlies = false;
@@ -42,15 +42,15 @@ Airport.Game.prototype = {
 			// Input handling
 			if(!this.planeLanded && this.game.input.activePointer.leftButton.isDown) {
 				if (this.plane.angle >= -20) {
-					this.plane.angle -= 2;
-					this.plane.body.velocity.x += 5;
+					this.plane.angle -= 0.75;
+					this.plane.body.velocity.x += 2;
 				}
 
-				this.plane.body.velocity.y -= 10;
+				this.plane.body.velocity.y -= 8;
 			}
 			else {
 				if (this.plane.angle < 0) {
-					this.plane.angle += 2;
+					this.plane.angle += 1;
 					this.plane.body.velocity.x -= 15;
 					this.plane.body.velocity.x = this.plane.body.velocity.x <= 150 ? 150 : this.plane.body.velocity.x;
 				}
