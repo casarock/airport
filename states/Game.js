@@ -15,9 +15,11 @@ Airport.Game.prototype = {
 
 	setupPlane: function() {
 		this.plane = this.game.add.sprite(100, 100, 'plane');
+		this.game.physics.enable(this.plane, Phaser.Physics.ARCADE);
+		this.plane.body.setSize(55, 5, -10, 18);
+
 		this.plane.scale.x = -1;
 		this.plane.anchor.setTo(0.3, 0.5);
-		this.game.physics.enable(this.plane, Phaser.Physics.ARCADE);
 
 		this.planeFlies = false;
 
@@ -42,7 +44,7 @@ Airport.Game.prototype = {
 			// Input handling
 			if(!this.planeLanded && this.game.input.activePointer.leftButton.isDown) {
 				if (this.plane.angle >= -20) {
-					this.plane.angle -= 0.75;
+					this.plane.angle -= 0.25;
 					this.plane.body.velocity.x += 2;
 				}
 
@@ -50,7 +52,7 @@ Airport.Game.prototype = {
 			}
 			else {
 				if (this.plane.angle < 0) {
-					this.plane.angle += 1;
+					this.plane.angle += 0.5;
 					this.plane.body.velocity.x -= 15;
 					this.plane.body.velocity.x = this.plane.body.velocity.x <= 150 ? 150 : this.plane.body.velocity.x;
 				}
@@ -94,6 +96,18 @@ Airport.Game.prototype = {
 	},
 
 	planeCrashed: function() {
+		this.hidePlane();
+		this.planeFlies = false;
+		var explosion = this.add.sprite(this.plane.position.x, this.plane.position.y, 'explode');
+        explosion.anchor.set(0.5, 0.5);
+
+        var anim = explosion.animations.add('boom');
+        anim.play('boom', 20);
+		anim.onComplete.add(this.explosionEnded, this);
+		//this.resetPlanePostion();
+	},
+
+	explosionEnded: function() {
 		this.resetPlanePostion();
 	},
 
@@ -107,6 +121,11 @@ Airport.Game.prototype = {
 		}
 	},
 
+	hidePlane: function() {
+		this.plane.visible = false;
+		this.stopPlane();
+	},
+
 	resetPlane: function() {
 		this.resetPlanePostion();
 		this.plane.body.gravity.set(0, 250);
@@ -114,16 +133,22 @@ Airport.Game.prototype = {
 		this.planeFlies = true;
 	},
 
+	stopPlane: function() {
+		this.plane.body.gravity.set(0, 0);
+		this.plane.body.velocity.x = 0;
+		this.plane.body.velocity.y = 0;
+	},
+
 	resetPlanePostion: function() {
 		this.plane.x = 100;
 		this.plane.y = 100;
 		this.planeLanded = false;
-		this.plane.body.gravity.set(0, 0);
-		this.plane.body.velocity.x = 0;
-		this.plane.body.velocity.y = 0;
+
+		this.stopPlane();
 
 		this.plane.angle = 0;
 		this.planeFlies = false;
+		this.plane.visible = true;
 	},
 
 	quitGame: function(pointer) {
@@ -131,7 +156,7 @@ Airport.Game.prototype = {
 	},
 
 	render: function() {
-
+		// this.game.debug.body(this.plane);
 		/* this.game.debug.body(this.planes[0].getSprite());
 		this.game.debug.body(this.planes[1].getSprite());
 		this.tubey.getGroup().forEachAlive(this.renderGroup, this);
