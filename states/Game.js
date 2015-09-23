@@ -3,9 +3,13 @@ Airport.Game = function(game) {
 
 Airport.Game.prototype = {
 	create: function() {
+
+		this.game.stage.backgroundColor = '#ACD8E2';
+
 		this.game.world.setBounds(0, 0, 1920, this.game.height);
 
-		this.background = this.game.add.sprite(0, this.game.height - 300, 'background');
+		this.farBackground = this.game.add.tileSprite(0, 100, 2048,  this.game.height, 'farbackground');
+		this.background = this.game.add.sprite(0, this.game.height - 275, 'background');
 
 		this.generateRunway();
 		this.setupPlane();
@@ -28,7 +32,7 @@ Airport.Game.prototype = {
 	},
 
 	generateRunway: function() {
-		this.runway = this.game.add.sprite(1200, this.game.height-50, 'runway');
+		this.runway = this.game.add.sprite(1200, this.game.height-20, 'runway');
 
 		this.game.physics.enable(this.runway, Phaser.Physics.ARCADE);
 		this.runway.body.setSize(this.runway.width, 4, 0, 10);
@@ -63,10 +67,13 @@ Airport.Game.prototype = {
 			this.game.physics.arcade.overlap(this.plane, this.runway, this.checkLanding, this.shouldCheckLanding, this);
 		}
 		else {
+
 			if (this.startKey.isDown) {
 				this.resetPlane();
 			}
 		}
+
+		this.farBackground.tilePosition.x = this.game.camera.x*0.5;
 	},
 
 	shouldCheckLanding: function() {
@@ -104,7 +111,6 @@ Airport.Game.prototype = {
         var anim = explosion.animations.add('boom');
         anim.play('boom', 20);
 		anim.onComplete.add(this.explosionEnded, this);
-		//this.resetPlanePostion();
 	},
 
 	explosionEnded: function() {
@@ -140,6 +146,8 @@ Airport.Game.prototype = {
 	},
 
 	resetPlanePostion: function() {
+		this.farBackground.tilePosition.x = 0;
+
 		this.plane.x = 100;
 		this.plane.y = 100;
 		this.planeLanded = false;
