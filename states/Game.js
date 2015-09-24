@@ -18,12 +18,14 @@ Airport.Game.prototype = {
 	},
 
 	generateBuildings: function(num, maxHeight, distanceToRunway) {
+		var buildings = {};
+
 		num = num || 3;
 		maxHeight = maxHeight || 200;
 		distanceToRunway = distanceToRunway || 300;
 
 		this.buildingGroup = this.game.add.group();
-		var buildings = {};
+
 		// Todo: Check for overlapping buildings.
 		for (var i = 0; i < num; i++) {
 			var building = {
@@ -54,7 +56,7 @@ Airport.Game.prototype = {
 		this.plane.scale.x = -1;
 		this.plane.anchor.setTo(0.3, 0.5);
 
-		this.planeFlies = false;
+		this.plane.flies = false;
 
 		this.plane.collideWorldBounds = true;
 		this.game.camera.follow(this.plane);
@@ -73,9 +75,9 @@ Airport.Game.prototype = {
 
 	update: function() {
 		// Take off
-		if (this.planeFlies) {
+		if (this.plane.flies) {
 			// Input handling
-			if(!this.planeLanded && this.game.input.activePointer.leftButton.isDown) {
+			if(!this.plane.landed && this.game.input.activePointer.leftButton.isDown) {
 				if (this.plane.angle >= -20) {
 					this.plane.angle -= 0.25;
 					this.plane.body.velocity.x += 2;
@@ -123,7 +125,7 @@ Airport.Game.prototype = {
 			this.plane.body.gravity.y = 0;
 			this.plane.body.velocity.y = 0;
 
-			this.planeLanded = true;
+			this.plane.landed = true;
 
 			if (this.plane.body.velocity.x <= 0) {
 				this.plane.body.velocity.x = 0;
@@ -134,7 +136,7 @@ Airport.Game.prototype = {
 
 	planeCrashed: function() {
 		this.hidePlane();
-		this.planeFlies = false;
+		this.plane.flies = false;
 		var explosion = this.add.sprite(this.plane.position.x, this.plane.position.y, 'explode');
         explosion.anchor.set(0.5, 0.5);
 
@@ -165,7 +167,7 @@ Airport.Game.prototype = {
 		//this.resetPlanePostion();
 		this.plane.body.gravity.set(0, 250);
 		this.plane.body.velocity.x = 150;
-		this.planeFlies = true;
+		this.plane.flies = true;
 	},
 
 	stopPlane: function() {
@@ -181,12 +183,12 @@ Airport.Game.prototype = {
 
 		this.plane.x = 100;
 		this.plane.y = 100;
-		this.planeLanded = false;
+		this.plane.landed = false;
 
 		this.stopPlane();
 
 		this.plane.angle = 0;
-		this.planeFlies = false;
+		this.plane.flies = false;
 		this.plane.visible = true;
 	},
 
