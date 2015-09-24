@@ -3,7 +3,6 @@ Airport.Game = function(game) {
 
 Airport.Game.prototype = {
 	create: function() {
-
 		this.game.stage.backgroundColor = '#ACD8E2';
 
 		this.game.world.setBounds(0, 0, 1920, this.game.height);
@@ -11,16 +10,46 @@ Airport.Game.prototype = {
 		this.farBackground = this.game.add.tileSprite(0, 100, 2048,  this.game.height, 'farbackground');
 		this.background = this.game.add.sprite(0, this.game.height - 275, 'background');
 
+		this.generateBuildings(10);
 		this.generateRunway();
 		this.setupPlane();
 
 		this.startKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
 	},
 
+	generateBuildings: function(num, maxHeight, distanceToRunway) {
+		num = num || 3;
+		maxHeight = maxHeight || 200;
+		distanceToRunway = distanceToRunway || 300;
+
+		this.buildingGroup = this.game.add.group();
+		var buildings = {};
+		// Todo: Check for overlapping buildings.
+		for (var i = 0; i < num; i++) {
+			var building = {
+				x: this.game.rnd.integerInRange(100, 1200 - distanceToRunway),
+				height: this.game.rnd.integerInRange(100, maxHeight)
+			};
+			buildings["" + building.x] = building;
+		}
+
+		for(var bSprite in buildings) {
+			var properties = buildings[bSprite],
+				yPos = this.game.height - properties.height;
+
+			var buildingCandidate = this.game.add.sprite(properties.x, yPos, 'white');
+			this.game.physics.enable(buildingCandidate, Phaser.Physics.ARCADE);
+			buildingCandidate.scale.y = properties.height/20;
+			buildingCandidate.scale.x = this.game.rnd.integerInRange(1, 3);
+
+			this.buildingGroup.add(buildingCandidate);
+		}
+	},
+
 	setupPlane: function() {
 		this.plane = this.game.add.sprite(100, 100, 'plane');
 		this.game.physics.enable(this.plane, Phaser.Physics.ARCADE);
-		this.plane.body.setSize(55, 5, -10, 18);
+		//this.plane.body.setSize(55, 5, -10, 18);
 
 		this.plane.scale.x = -1;
 		this.plane.anchor.setTo(0.3, 0.5);
@@ -65,6 +94,7 @@ Airport.Game.prototype = {
 			this.checkPlanePosition();
 
 			this.game.physics.arcade.overlap(this.plane, this.runway, this.checkLanding, this.shouldCheckLanding, this);
+			this.game.physics.arcade.overlap(this.plane, this.buildingGroup, this.planeCrashed, null, this);
 		}
 		else {
 
@@ -110,11 +140,10 @@ Airport.Game.prototype = {
 
         var anim = explosion.animations.add('boom');
         anim.play('boom', 20);
-		anim.onComplete.add(this.explosionEnded, this);
-	},
-
-	explosionEnded: function() {
-		this.resetPlanePostion();
+		anim.onComplete.add(function() {
+			explosion.destroy();
+			this.resetPlanePostion();
+		}, this);
 	},
 
 	checkPlanePosition: function() {
@@ -133,7 +162,7 @@ Airport.Game.prototype = {
 	},
 
 	resetPlane: function() {
-		this.resetPlanePostion();
+		//this.resetPlanePostion();
 		this.plane.body.gravity.set(0, 250);
 		this.plane.body.velocity.x = 150;
 		this.planeFlies = true;
@@ -147,6 +176,8 @@ Airport.Game.prototype = {
 
 	resetPlanePostion: function() {
 		this.farBackground.tilePosition.x = 0;
+		this.buildingGroup.destroy();
+		this.generateBuildings(10);
 
 		this.plane.x = 100;
 		this.plane.y = 100;
