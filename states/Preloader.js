@@ -10,6 +10,9 @@ Airport.Preloader.prototype = {
         this.load.image('plane', 'images/airbus_380.png');
         this.load.image('runway', 'images/runway.png');
         this.load.image('background', 'images/hills-scroll.png');
+        this.load.image('cloud-1', 'images/cloud-1.png');
+        this.load.image('cloud-2', 'images/cloud-2.png');
+        this.load.image('cloud-0', 'images/cloud-0.png');
         this.load.image('farbackground', 'images/scroll_bg_far.png');
         this.load.spritesheet('explode', 'images/exp2_0.png', 64, 64);
     },

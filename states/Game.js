@@ -10,11 +10,28 @@ Airport.Game.prototype = {
 		this.farBackground = this.game.add.tileSprite(0, 100, 2048,  this.game.height, 'farbackground');
 		this.background = this.game.add.sprite(0, this.game.height - 275, 'background');
 
+		this.createClouds();
 		this.generateBuildings(10);
 		this.generateRunway();
 		this.setupPlane();
 
 		this.startKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
+	},
+
+	createClouds: function() {
+		var num = 20;
+		this.clouds = this.game.add.group();
+
+		for (var i = 0; i < num; i++) {
+			var cloud = this.game.add.sprite(i * this.game.rnd.integerInRange(10, 200),
+												 this.game.rnd.integerInRange(50, 400),
+												 'cloud-' + this.game.rnd.integerInRange(0, 2));
+			this.game.physics.enable(cloud, Phaser.Physics.ARCADE);
+			cloud.body.velocity.x = -(this.game.rnd.integerInRange(5, 50));
+			cloud.checkWorldBounds = true;
+			cloud.events.onOutOfBounds.add(this.cloudOut, this);
+			this.clouds.add(cloud);
+		}
 	},
 
 	generateBuildings: function(num, maxHeight, distanceToRunway) {
@@ -94,7 +111,6 @@ Airport.Game.prototype = {
 			}
 
 			this.checkPlanePosition();
-
 			this.game.physics.arcade.overlap(this.plane, this.runway, this.checkLanding, this.shouldCheckLanding, this);
 			this.game.physics.arcade.overlap(this.plane, this.buildingGroup, this.planeCrashed, null, this);
 		}
@@ -113,7 +129,6 @@ Airport.Game.prototype = {
 	},
 
 	checkLanding: function() {
-
 		var velY = this.plane.body.velocity.y;
 
 		if (velY > 175) {
@@ -190,6 +205,11 @@ Airport.Game.prototype = {
 		this.plane.angle = 0;
 		this.plane.flies = false;
 		this.plane.visible = true;
+	},
+
+	cloudOut: function(cloud) {
+	    cloud.reset(this.game.world.width, this.game.rnd.integerInRange(25, 380));
+		cloud.body.velocity.x = -(this.game.rnd.integerInRange(5, 50));
 	},
 
 	quitGame: function(pointer) {
