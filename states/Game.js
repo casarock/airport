@@ -4,7 +4,7 @@ Airport.Game = function(game) {
 Airport.Game.prototype = {
 	create: function() {
 		this.timer = null;
-		this.countdown = 3;
+		this.countdown = COUNTDOWN;
 		this.game.stage.backgroundColor = '#ACD8E2';
 
 		this.game.world.setBounds(0, 0, 1920, this.game.height);
@@ -22,7 +22,7 @@ Airport.Game.prototype = {
 	},
 
 	createClouds: function() {
-		var num = 20;
+		var num = CLOUDS;
 		this.clouds = this.game.add.group();
 
 		for (var i = 0; i < num; i++) {
@@ -125,7 +125,7 @@ Airport.Game.prototype = {
 		this.scoreText.setText(this.countdown);
 
 		if (this.countdown <= 0) {
-			this.countdown = 3;
+			this.countdown = COUNTDOWN;
 			this.game.time.events.remove(this.timer);
 			this.timer = null;
 			this.scoreText.destroy();
