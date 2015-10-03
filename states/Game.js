@@ -17,7 +17,7 @@ Airport.Game.prototype = {
 		this.generateRunway();
 		this.setupPlane();
 
-		this.state = 'COUNTDOWN';
+		this.state = STATES.COUNTDOWN;
 		this.startKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
 	},
 
@@ -96,15 +96,15 @@ Airport.Game.prototype = {
 	update: function() {
 		// Take off
 		switch(this.state) {
-			case "PLANE_FLYING":
+			case STATES.PLANE_FLYING:
 				this.stateFlying();
 				break;
 
-			case "COUNTDOWN":
+			case STATES.COUNTDOWN:
 				this.stateCountdown();
 				break;
 
-			case "GAMEOVER":
+			case STATES.GAMEOVER:
 				break;
 
 		}
@@ -112,7 +112,7 @@ Airport.Game.prototype = {
 		this.farBackground.tilePosition.x = this.game.camera.x*0.5;
 	},
 
-	stateCountdown: function() {	
+	stateCountdown: function() {
 		if (this.timer === null) {
 			this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'kenneyfont', ""+ this.countdown);
 			this.scoreText.scale.setTo(2);
@@ -183,7 +183,7 @@ Airport.Game.prototype = {
 
 	planeCrashed: function() {
 		this.hidePlane();
-		this.state = "COUNTDOWN";
+		this.state = STATES.COUNTDOWN;
 		var explosion = this.add.sprite(this.plane.position.x, this.plane.position.y, 'explode');
         explosion.anchor.set(0.5, 0.5);
 
@@ -214,7 +214,7 @@ Airport.Game.prototype = {
 		//this.resetPlanePostion();
 		this.plane.body.gravity.set(0, 250);
 		this.plane.body.velocity.x = 150;
-		this.state = "PLANE_FLYING";
+		this.state = STATES.PLANE_FLYING;
 	},
 
 	stopPlane: function() {
@@ -235,7 +235,7 @@ Airport.Game.prototype = {
 		this.stopPlane();
 
 		this.plane.angle = 0;
-		this.state = "COUNTDOWN";
+		this.state = STATES.COUNTDOWN;
 		this.plane.visible = true;
 	},
 
