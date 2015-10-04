@@ -18,7 +18,9 @@ Airport.Game.prototype = {
 		this.setupPlane();
 
 		this.state = STATES.COUNTDOWN;
-		this.startKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
+
+		this.scoreText = this.game.add.bitmapText(16, 16, 'kenneyfont', "Score: "+ this.game.GAME_DATA.score);
+		this.scoreText.fixedToCamera = true;
 	},
 
 	createClouds: function() {
@@ -49,7 +51,7 @@ Airport.Game.prototype = {
 		// Todo: Check for overlapping buildings.
 		for (var i = 0; i < num; i++) {
 			var building = {
-				x: this.game.rnd.integerInRange(100, 1200 - distanceToRunway),
+				x: this.game.rnd.integerInRange(100, RUNWAY_DISTANCE - distanceToRunway),
 				height: this.game.rnd.integerInRange(100, maxHeight)
 			};
 			buildings["" + building.x] = building;
@@ -83,7 +85,7 @@ Airport.Game.prototype = {
 	},
 
 	generateRunway: function() {
-		this.runway = this.game.add.sprite(1200, this.game.height-20, 'runway');
+		this.runway = this.game.add.sprite(RUNWAY_DISTANCE, this.game.height-20, 'runway');
 
 		this.game.physics.enable(this.runway, Phaser.Physics.ARCADE);
 		this.runway.body.setSize(this.runway.width, 4, 0, 10);
@@ -110,25 +112,26 @@ Airport.Game.prototype = {
 		}
 
 		this.farBackground.tilePosition.x = this.game.camera.x*0.5;
+
 	},
 
 	stateCountdown: function() {
 		if (this.timer === null) {
-			this.scoreText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'kenneyfont', ""+ this.countdown);
-			this.scoreText.scale.setTo(2);
+			this.countDownText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'kenneyfont', ""+ this.countdown);
+			this.countDownText.scale.setTo(2);
 			this.timer = this.game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter, this);
 		}
 	},
 
 	updateCounter: function() {
 		this.countdown -= 1;
-		this.scoreText.setText(this.countdown);
+		this.countDownText.setText(this.countdown);
 
 		if (this.countdown <= 0) {
 			this.countdown = COUNTDOWN;
 			this.game.time.events.remove(this.timer);
 			this.timer = null;
-			this.scoreText.destroy();
+			this.countDownText.destroy();
 			this.resetPlane();
 		}
 	},
@@ -147,7 +150,7 @@ Airport.Game.prototype = {
 			if (this.plane.angle < 0) {
 				this.plane.angle += 0.5;
 				this.plane.body.velocity.x -= 15;
-				this.plane.body.velocity.x = this.plane.body.velocity.x <= 150 ? 150 : this.plane.body.velocity.x;
+				this.plane.body.velocity.x = this.plane.body.velocity.x <= MIN_PLANE_VELOCITY ? MIN_PLANE_VELOCITY : this.plane.body.velocity.x;
 			}
 		}
 
@@ -168,6 +171,11 @@ Airport.Game.prototype = {
 			this.planeCrashed();
 		}
 		else {
+			// Score when plane landed.
+			if (!this.plane.landed) {
+				this.addScore(velY);
+			}
+
 			this.plane.body.velocity.x -= 1;
 			this.plane.body.gravity.y = 0;
 			this.plane.body.velocity.y = 0;
@@ -246,6 +254,13 @@ Airport.Game.prototype = {
 
 	quitGame: function(pointer) {
 		this.state.start('MainMenu');
+	},
+
+	addScore: function(velocityY) {
+		var addScore = Math.floor(1000/velocityY);
+		this.game.GAME_DATA.score += addScore;
+
+		this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
 	},
 
 	render: function() {

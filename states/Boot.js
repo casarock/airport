@@ -7,6 +7,11 @@ Airport.Boot = function (game) {
 Airport.Boot.prototype = {
 
     init: function () {
+        this.game.GAME_DATA = {
+            score: 0,
+            perfectLandings: 0
+        };
+        
         this.input.maxPointers = 1;
         this.stage.disableVisibilityChange = true;
 
