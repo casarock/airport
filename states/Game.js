@@ -88,7 +88,7 @@ Airport.Game.prototype = {
 		this.game.physics.enable(this.runway, Phaser.Physics.ARCADE);
 		this.runway.body.setSize(this.runway.width, 4, 0, 10);
 
-		this.runway.width = 700;
+		this.runway.width = RUNWAY_WIDTH;
 
 		this.runway.body.immovable = true;
 	},
