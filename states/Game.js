@@ -5,6 +5,7 @@ Airport.Game.prototype = {
 	create: function() {
 		this.timer = null;
 		this.countdown = COUNTDOWN;
+		this.landingVelocity = null;
 		this.game.stage.backgroundColor = '#ACD8E2';
 
 		this.game.world.setBounds(0, 0, 1920, this.game.height);
@@ -165,16 +166,13 @@ Airport.Game.prototype = {
 
 	checkLanding: function() {
 		var velY = this.plane.body.velocity.y;
+		this.landingVelocity = this.landingVelocity === null ? velY : this.landingVelocity;
 
 		if (velY > 175) {
 			// Boom..
 			this.planeCrashed();
 		}
 		else {
-			// Score when plane landed.
-			if (!this.plane.landed) {
-				this.addScore(velY);
-			}
 
 			this.plane.body.velocity.x -= 1;
 			this.plane.body.gravity.y = 0;
@@ -184,6 +182,8 @@ Airport.Game.prototype = {
 
 			if (this.plane.body.velocity.x <= 0) {
 				this.plane.body.velocity.x = 0;
+				this.addScore();
+				this.landingVelocity = null;
 				this.resetPlanePostion();
 			}
 		}
@@ -256,8 +256,9 @@ Airport.Game.prototype = {
 		this.state.start('MainMenu');
 	},
 
-	addScore: function(velocityY) {
-		var addScore = Math.floor(1000/velocityY);
+	addScore: function() {
+		console.log(this.landingVelocity);
+		var addScore = Math.floor(1000/this.landingVelocity);
 		this.game.GAME_DATA.score += addScore;
 
 		this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
