@@ -257,11 +257,21 @@ Airport.Game.prototype = {
 	},
 
 	addScore: function() {
-		console.log(this.landingVelocity);
-		var addScore = Math.floor(1000/this.landingVelocity);
-		this.game.GAME_DATA.score += addScore;
+		var loop = null,
+			addScore = Math.floor(1000/this.landingVelocity),
+			newScore = this.game.GAME_DATA.score + addScore;
 
-		this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
+		var loopCallback = function() {
+			if (this.game.GAME_DATA.score < newScore) {
+				this.game.GAME_DATA.score += 1
+				this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
+			}
+			else {
+				this.game.time.events.remove(loop);
+			}
+		};
+
+		loop = this.game.time.events.loop(Phaser.Timer.SECOND/8, loopCallback, this);
 	},
 
 	render: function() {
