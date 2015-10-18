@@ -4,7 +4,7 @@ Airport.MainMenu = function (game) {
 Airport.MainMenu.prototype = {
 
 	create: function () {
-		this.game.stage.backgroundColor = '#ffffff';
+		this.game.stage.backgroundColor = '#ACD8E2';
 	},
 
 	play: function() {

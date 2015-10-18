@@ -6,6 +6,7 @@ Airport.Game.prototype = {
 		this.timer = null;
 		this.countdown = COUNTDOWN;
 		this.landingVelocity = null;
+
 		this.game.stage.backgroundColor = '#ACD8E2';
 
 		this.game.world.setBounds(0, 0, 1920, this.game.height);
@@ -42,10 +43,22 @@ Airport.Game.prototype = {
 
 	generateBuildings: function(num, maxHeight, distanceToRunway) {
 		var buildings = {};
+		var shades = [
+				0xcccccc,
+				0xdddddd,
+				0xaaaaaa,
+				0x999999,
+				0x555555,
+				0xbbbbbb,
+				0xffffff
+			],
+			multiplier = (this.game.GAME_DATA.score - (this.game.GAME_DATA.score%10)),
+			maxHeightFactor = (multiplier + 200 < this.game.height - 100) ? multiplier + 200 : (this.game.height - 100),
+			myDistanceFactor = (300 - multiplier < 200) ? 200 : (300- multiplier);
 
 		num = num || 3;
-		maxHeight = maxHeight || 200;
-		distanceToRunway = distanceToRunway || 300;
+		maxHeight = maxHeight || maxHeightFactor;
+		distanceToRunway = distanceToRunway || myDistanceFactor;
 
 		this.buildingGroup = this.game.add.group();
 
@@ -63,21 +76,26 @@ Airport.Game.prototype = {
 				yPos = this.game.height - properties.height;
 
 			var buildingCandidate = this.game.add.sprite(properties.x, yPos, 'white');
-			this.game.physics.enable(buildingCandidate, Phaser.Physics.ARCADE);
+			buildingCandidate.tint = shades[this.game.rnd.integerInRange(0, shades.length)];
+
+			//this.game.physics.enable(buildingCandidate, Phaser.Physics.ARCADE);
 			buildingCandidate.scale.y = properties.height/20;
 			buildingCandidate.scale.x = this.game.rnd.integerInRange(1, 3);
 
 			this.buildingGroup.add(buildingCandidate);
 		}
+
+		this.game.physics.enable(this.buildingGroup, Phaser.Physics.ARCADE);
 	},
 
 	setupPlane: function() {
 		this.plane = this.game.add.sprite(100, 100, 'plane');
 		this.game.physics.enable(this.plane, Phaser.Physics.ARCADE);
-		//this.plane.body.setSize(55, 5, -10, 18);
-
 		this.plane.scale.x = -1;
 		this.plane.anchor.setTo(0.3, 0.5);
+		this.plane.body.setSize(55, 5, -10, 18);
+
+		//this.plane.body.setSize(this.plane.width, this.plane.height - 10, 0, 10);
 
 		this.plane.flies = false;
 
@@ -109,7 +127,6 @@ Airport.Game.prototype = {
 
 			case STATES.GAMEOVER:
 				break;
-
 		}
 
 		this.farBackground.tilePosition.x = this.game.camera.x*0.5;
@@ -173,7 +190,6 @@ Airport.Game.prototype = {
 			this.planeCrashed();
 		}
 		else {
-
 			this.plane.body.velocity.x -= 1;
 			this.plane.body.gravity.y = 0;
 			this.plane.body.velocity.y = 0;
@@ -219,7 +235,6 @@ Airport.Game.prototype = {
 	},
 
 	resetPlane: function() {
-		//this.resetPlanePostion();
 		this.plane.body.gravity.set(0, 250);
 		this.plane.body.velocity.x = 150;
 		this.state = STATES.PLANE_FLYING;
@@ -275,12 +290,12 @@ Airport.Game.prototype = {
 	},
 
 	render: function() {
-		// this.game.debug.body(this.plane);
+		//this.game.debug.body(this.plane);
 		/* this.game.debug.body(this.planes[0].getSprite());
 		this.game.debug.body(this.planes[1].getSprite());
 		this.tubey.getGroup().forEachAlive(this.renderGroup, this);
 		*/
-		//this.bubbles.forEachAlive(this.renderGroup, this);
+		//this.buildingGroup.forEachAlive(this.renderGroup, this);
 
 	},
 
