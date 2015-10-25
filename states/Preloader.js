@@ -6,6 +6,7 @@ Airport.Preloader.prototype = {
 
     preload: function() {
         this.load.bitmapFont('kenneyfont', 'fonts/kenneyspace_72/kenneyspace_72.png', 'fonts/kenneyspace_72/kenneyspace_72.xml');
+        this.load.atlas('ui', 'images/ui_sprite.png', 'images/ui_sprite.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
         this.load.image('white', 'images/white.png');
         this.load.image('plane', 'images/airbus_380.png');
         this.load.image('runway', 'images/runway.png');

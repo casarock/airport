@@ -4,6 +4,7 @@ Airport.Game = function(game) {
 Airport.Game.prototype = {
 	create: function() {
 		this.timer = null;
+		this.gameOverInitialized = false;
 		this.countdown = COUNTDOWN;
 		this.landingVelocity = null;
 
@@ -23,6 +24,10 @@ Airport.Game.prototype = {
 
 		this.scoreText = this.game.add.bitmapText(16, 16, 'kenneyfont', "Score: "+ this.game.GAME_DATA.score);
 		this.scoreText.fixedToCamera = true;
+		this.highScoreText = this.game.add.bitmapText(16, 48, 'kenneyfont', "Highscore: "+ this.game.GAME_DATA.score);
+		this.highScoreText.fixedToCamera = true;
+
+		this.upKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	},
 
 	createClouds: function() {
@@ -126,11 +131,69 @@ Airport.Game.prototype = {
 				break;
 
 			case STATES.GAMEOVER:
+				this.stateGameOver();
 				break;
 		}
 
 		this.farBackground.tilePosition.x = this.game.camera.x*0.5;
 
+	},
+
+	stateGameOver: function() {
+		if (!this.gameOverInitialized) {
+			this.uiBackdrop = this.game.add.sprite(0, 0, 'ui', 'menu_backdrop');
+			this.uiBackdrop.anchor.setTo(0.5, 0.5);
+			this.uiBackdrop.x = this.game.width/2;
+			this.uiBackdrop.y = this.game.height/2;
+
+			this.retryButton = this.add.button(-100, -400, 'ui', actionOnClickRetry, this, 'button_retry', 'button_retry', 'button_retry_pressed');
+			this.retryButton.anchor.setTo(0.5);
+			var buttonRetryPos = {
+				x: this.uiBackdrop.x + this.uiBackdrop.width/2 - this.retryButton.width/2 - 16,
+				y: this.uiBackdrop.y + this.uiBackdrop.height/2 - this.retryButton.height/2 - 16
+			}
+
+			this.aboutButton = this.add.button(-100, -400, 'ui', actionOnClickAbout, this, 'button_about', 'button_about', 'button_about_pressed');
+			this.aboutButton.anchor.setTo(0.5);
+			var buttonAboutPos = {
+				x: this.uiBackdrop.x - this.uiBackdrop.width/2 + this.aboutButton.width/2 + 16,
+				y: buttonRetryPos.y
+			}
+
+			this.retryButton.x = buttonRetryPos.x;
+			this.retryButton.y = buttonRetryPos.y;
+			this.aboutButton.x = buttonAboutPos.x;
+			this.aboutButton.y = buttonAboutPos.y;
+
+			var finalScoreText = "Your plane crashed\n";
+			finalScoreText += "Your score: " + this.game.GAME_DATA.score;
+			var text = this.game.add.bitmapText(this.game.width/2, this.uiBackdrop.y + 16, 'kenneyfont', finalScoreText);
+			text.anchor.setTo(0.5, 1);
+
+			if (this.game.GAME_DATA.highScore < this.game.GAME_DATA.score) {
+				this.game.GAME_DATA.highScore = this.game.GAME_DATA.score;
+				this.highScoreText.setText("Highscore: "+ this.game.GAME_DATA.score);
+			}
+
+			this.uiBackdrop.fixedToCamera = this.retryButton.fixedToCamera = this.aboutButton.fixedToCamera =  text.fixedToCamera = true;
+
+			this.gameOverInitialized = true;
+		}
+
+		function actionOnClickRetry() {
+			this.uiBackdrop.destroy();
+			this.retryButton.destroy();
+			this.aboutButton.destroy();
+			this.gameOverInitialized = false;
+			this.game.GAME_DATA.score = 0;
+			this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
+			text.destroy();
+			this.resetPlanePostion();
+		}
+
+		function actionOnClickAbout() {
+
+		}
 	},
 
 	stateCountdown: function() {
@@ -156,7 +219,8 @@ Airport.Game.prototype = {
 
 	stateFlying: function() {
 		// Input handling
-		if (!this.plane.landed && this.game.input.activePointer.leftButton.isDown) {
+		if (!this.plane.landed &&
+			 (this.game.input.activePointer.leftButton.isDown || this.upKey.isDown)) {
 			if (this.plane.angle >= -20) {
 				this.plane.angle -= 0.25;
 				this.plane.body.velocity.x += 2;
@@ -207,7 +271,7 @@ Airport.Game.prototype = {
 
 	planeCrashed: function() {
 		this.hidePlane();
-		this.state = STATES.COUNTDOWN;
+		this.state = STATES.GAMEOVER;
 		var explosion = this.add.sprite(this.plane.position.x, this.plane.position.y, 'explode');
         explosion.anchor.set(0.5, 0.5);
 
@@ -215,7 +279,7 @@ Airport.Game.prototype = {
         anim.play('boom', 20);
 		anim.onComplete.add(function() {
 			explosion.destroy();
-			this.resetPlanePostion();
+			//this.resetPlanePostion();
 		}, this);
 	},
 
@@ -286,7 +350,7 @@ Airport.Game.prototype = {
 			}
 		};
 
-		loop = this.game.time.events.loop(Phaser.Timer.SECOND/8, loopCallback, this);
+		loop = this.game.time.events.loop(Phaser.Timer.SECOND/50, loopCallback, this);
 	},
 
 	render: function() {
