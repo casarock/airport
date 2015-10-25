@@ -141,11 +141,7 @@ Airport.Game.prototype = {
 
 	stateGameOver: function() {
 		if (!this.gameOverInitialized) {
-			this.uiBackdrop = this.game.add.sprite(0, 0, 'ui', 'menu_backdrop');
-			this.uiBackdrop.anchor.setTo(0.5, 0.5);
-			this.uiBackdrop.x = this.game.width/2;
-			this.uiBackdrop.y = this.game.height/2;
-
+			this.showUI();
 			this.retryButton = this.add.button(-100, -400, 'ui', actionOnClickRetry, this, 'button_retry', 'button_retry', 'button_retry_pressed');
 			this.retryButton.anchor.setTo(0.5);
 			var buttonRetryPos = {
@@ -153,17 +149,8 @@ Airport.Game.prototype = {
 				y: this.uiBackdrop.y + this.uiBackdrop.height/2 - this.retryButton.height/2 - 16
 			}
 
-			this.aboutButton = this.add.button(-100, -400, 'ui', actionOnClickAbout, this, 'button_about', 'button_about', 'button_about_pressed');
-			this.aboutButton.anchor.setTo(0.5);
-			var buttonAboutPos = {
-				x: this.uiBackdrop.x - this.uiBackdrop.width/2 + this.aboutButton.width/2 + 16,
-				y: buttonRetryPos.y
-			}
-
 			this.retryButton.x = buttonRetryPos.x;
 			this.retryButton.y = buttonRetryPos.y;
-			this.aboutButton.x = buttonAboutPos.x;
-			this.aboutButton.y = buttonAboutPos.y;
 
 			var finalScoreText = "Your plane crashed\n";
 			finalScoreText += "Your score: " + this.game.GAME_DATA.score;
@@ -190,6 +177,24 @@ Airport.Game.prototype = {
 			text.destroy();
 			this.resetPlanePostion();
 		}
+	},
+
+	showUI: function() {
+		this.uiBackdrop = this.game.add.sprite(0, 0, 'ui', 'menu_backdrop');
+		this.uiBackdrop.anchor.setTo(0.5, 0.5);
+		this.uiBackdrop.x = this.game.width/2;
+		this.uiBackdrop.y = this.game.height/2;
+
+
+		this.aboutButton = this.add.button(-100, -400, 'ui', actionOnClickAbout, this, 'button_about', 'button_about', 'button_about_pressed');
+		this.aboutButton.anchor.setTo(0.5);
+		var buttonAboutPos = {
+			x: this.uiBackdrop.x - this.uiBackdrop.width/2 + this.aboutButton.width/2 + 16,
+			y: this.uiBackdrop.y + this.uiBackdrop.height/2 - this.aboutButton.height/2 - 16
+		}
+
+		this.aboutButton.x = buttonAboutPos.x;
+		this.aboutButton.y = buttonAboutPos.y;
 
 		function actionOnClickAbout() {
 
