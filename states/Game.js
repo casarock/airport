@@ -20,7 +20,7 @@ Airport.Game.prototype = {
 		this.generateRunway();
 		this.setupPlane();
 
-		this.state = STATES.COUNTDOWN;
+		this.state = STATES.WELCOME;
 
 		this.scoreText = this.game.add.bitmapText(16, 16, 'kenneyfont', "Score: "+ this.game.GAME_DATA.score);
 		this.scoreText.fixedToCamera = true;
@@ -130,13 +130,49 @@ Airport.Game.prototype = {
 				this.stateCountdown();
 				break;
 
+			case STATES.WELCOME:
+				this.stateWelcome();
+				break;
+
 			case STATES.GAMEOVER:
 				this.stateGameOver();
 				break;
 		}
 
 		this.farBackground.tilePosition.x = this.game.camera.x*0.5;
+	},
 
+	stateWelcome: function() {
+		if (!this.welcomeInitialized) {
+			this.showUI();
+			this.startButton = this.add.button(-100, -400, 'ui', actionOnClickStart, this, 'button_start', 'button_start', 'button_start_pressed');
+			this.startButton.anchor.setTo(0.5);
+			var buttonRetryPos = {
+				x: this.uiBackdrop.x + this.uiBackdrop.width/2 - this.startButton.width/2 - 16,
+				y: this.uiBackdrop.y + this.uiBackdrop.height/2 - this.startButton.height/2 - 16
+			}
+
+			this.startButton.x = buttonRetryPos.x;
+			this.startButton.y = buttonRetryPos.y;
+
+			var welcomeText = "Land the plane safely\n\n";
+			var text = this.game.add.bitmapText(this.game.width/2, this.uiBackdrop.y + 16, 'kenneyfont', welcomeText);
+			text.anchor.setTo(0.5, 1);
+
+			this.highScoreText.setText("Highscore: "+ this.game.GAME_DATA.score);
+			this.uiBackdrop.fixedToCamera = this.startButton.fixedToCamera = this.aboutButton.fixedToCamera =  text.fixedToCamera = true;
+			this.welcomeInitialized = true;
+		}
+
+		function actionOnClickStart() {
+			this.cleanUpUI();
+			this.startButton.destroy();
+			this.welcomeInitialized = false;
+			this.game.GAME_DATA.score = 0;
+			this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
+			text.destroy();
+			this.resetPlanePostion();
+		}
 	},
 
 	stateGameOver: function() {
@@ -168,9 +204,8 @@ Airport.Game.prototype = {
 		}
 
 		function actionOnClickRetry() {
-			this.uiBackdrop.destroy();
+			this.cleanUpUI();
 			this.retryButton.destroy();
-			this.aboutButton.destroy();
 			this.gameOverInitialized = false;
 			this.game.GAME_DATA.score = 0;
 			this.scoreText.setText("Score: " + this.game.GAME_DATA.score);
@@ -180,6 +215,7 @@ Airport.Game.prototype = {
 	},
 
 	showUI: function() {
+
 		this.uiBackdrop = this.game.add.sprite(0, 0, 'ui', 'menu_backdrop');
 		this.uiBackdrop.anchor.setTo(0.5, 0.5);
 		this.uiBackdrop.x = this.game.width/2;
@@ -199,6 +235,11 @@ Airport.Game.prototype = {
 		function actionOnClickAbout() {
 
 		}
+	},
+
+	cleanUpUI: function() {
+		this.uiBackdrop.destroy();
+		this.aboutButton.destroy();
 	},
 
 	stateCountdown: function() {
@@ -225,7 +266,7 @@ Airport.Game.prototype = {
 	stateFlying: function() {
 		// Input handling
 		if (!this.plane.landed &&
-			 (this.game.input.activePointer.leftButton.isDown || this.upKey.isDown)) {
+			 (this.game.input.activePointer.isDown || this.upKey.isDown)) {
 			if (this.plane.angle >= -20) {
 				this.plane.angle -= 0.25;
 				this.plane.body.velocity.x += 2;
