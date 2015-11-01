@@ -5,7 +5,6 @@ Airport.Game.prototype = {
 	create: function() {
 		this.timer = null;
 		this.gameOverInitialized = false;
-		this.countdown = COUNTDOWN;
 		this.landingVelocity = null;
 
 		this.game.stage.backgroundColor = '#ACD8E2';
@@ -215,12 +214,10 @@ Airport.Game.prototype = {
 	},
 
 	showUI: function() {
-
 		this.uiBackdrop = this.game.add.sprite(0, 0, 'ui', 'menu_backdrop');
 		this.uiBackdrop.anchor.setTo(0.5, 0.5);
 		this.uiBackdrop.x = this.game.width/2;
 		this.uiBackdrop.y = this.game.height/2;
-
 
 		this.aboutButton = this.add.button(-100, -400, 'ui', actionOnClickAbout, this, 'button_about', 'button_about', 'button_about_pressed');
 		this.aboutButton.anchor.setTo(0.5);
@@ -243,22 +240,21 @@ Airport.Game.prototype = {
 	},
 
 	stateCountdown: function() {
-		if (this.timer === null) {
-			this.countDownText = this.game.add.bitmapText(this.game.width/2, this.game.height/2, 'kenneyfont', ""+ this.countdown);
-			this.countDownText.scale.setTo(2);
-			this.timer = this.game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter, this);
+		if (!this.tapAnimation) {
+			this.tapAnimation = this.add.sprite(this.game.width/2, this.game.height/2, 'tap');
+			this.tapAnimation.animations.add('tap');
+			this.tapAnimation.animations.play('tap', 2, true);
+			this.tapAnimation.scale.setTo(2,2);
+			this.tapAnimation.anchor.setTo(0.5, 0.5);
+
+			this.tapAnimation.x = this.game.width/2;
+			this.tapAnimation.y = this.game.height/2;
+			var tween = this.add.tween(this.tapAnimation.scale).to({ x: 1.5, y: 1.5}, 250, Phaser.Easing.Linear.None, true);
 		}
-	},
 
-	updateCounter: function() {
-		this.countdown -= 1;
-		this.countDownText.setText(this.countdown);
-
-		if (this.countdown <= 0) {
-			this.countdown = COUNTDOWN;
-			this.game.time.events.remove(this.timer);
-			this.timer = null;
-			this.countDownText.destroy();
+		if (this.game.input.activePointer.isDown) {
+			this.tapAnimation.destroy();
+			this.tapAnimation = null;
 			this.resetPlane();
 		}
 	},
@@ -325,7 +321,6 @@ Airport.Game.prototype = {
         anim.play('boom', 20);
 		anim.onComplete.add(function() {
 			explosion.destroy();
-			//this.resetPlanePostion();
 		}, this);
 	},
 

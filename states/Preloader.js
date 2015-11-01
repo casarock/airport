@@ -16,6 +16,7 @@ Airport.Preloader.prototype = {
         this.load.image('cloud-0', 'images/cloud-0.png');
         this.load.image('farbackground', 'images/scroll_bg_far.png');
         this.load.spritesheet('explode', 'images/exp2_0.png', 64, 64);
+        this.load.spritesheet('tap', 'images/tap_sheet.png', 69, 69, 2);
     },
 
     create: function() {
